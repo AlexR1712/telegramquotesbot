@@ -1,0 +1,11 @@
+{
+    "name": "phpdevenezuela/telegrambot",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Alexander Rodriguez",
+            "email": "alexr1712@gmail.com"
+        }
+    ],
+    "require": {}
+}

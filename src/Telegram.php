@@ -1,15 +1,29 @@
 <?php
+
 /**
- * Codigo base encontrado en https://core.telegram.org/bots/samples/hellobot.
+ * Class create by AlexR1712
  */
-define('BOT_TOKEN', '12345678:replace-me-with-real-token');
-define('WEBHOOK_URL', 'https://your.webhook/url/bot.php');
-define('API_URL', 'https://api.telegram.org/bot'.BOT_TOKEN.'/');
+print(realpath('.'));
+class Telegram
+{
+    private $token;
+    private $webhook;
+    private $apiUrl;
+    
+    public function __construct($pwrtelegram = false)
+    {
+        /**
+         * Can use PWRTelegram for active more power of telegram
+         */
+        $config = parse_ini_file("bot.config");
+        $this->apiUrl = ($pwrtelegram) ? 'https://api.pwrtelegram.xyz/bot'.$config['BOT_TOKEN'].'/' : 'https://api.telegram.org/bot'.$config['BOT_TOKEN'].'/';
+    }
+
 
 /**
  * @param string $method
  */
-function apiRequestWebhook($method, $parameters)
+public function apiRequestWebhook($method, $parameters)
 {
     if (!is_string($method)) {
         error_log("El nombre del método debe ser una cadena de texto\n");
@@ -35,7 +49,7 @@ function apiRequestWebhook($method, $parameters)
 /**
  * @param resource $handle
  */
-function exec_curl_request($handle)
+public function exec_curl_request($handle)
 {
     $response = curl_exec($handle);
     if ($response === false) {
@@ -79,7 +93,7 @@ function exec_curl_request($handle)
 /**
  * @param string $method
  */
-function apiRequest($method, $parameters)
+public function apiRequest($method, $parameters)
 {
     if (!is_string($method)) {
         error_log("El nombre del método debe ser una cadena de texto\n");
@@ -104,20 +118,20 @@ function apiRequest($method, $parameters)
         }
     }
 
-    $url = API_URL.$method.'?'.http_build_query($parameters);
+    $url = $this->apiUrl.$method.'?'.http_build_query($parameters);
     $handle = curl_init($url);
     curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 5);
     curl_setopt($handle, CURLOPT_TIMEOUT, 60);
     curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
 
-    return exec_curl_request($handle);
+    return self::exec_curl_request($handle);
 }
 
 /**
  * @param string $method
  */
-function apiRequestJson($method, $parameters)
+public function apiRequestJson($method, $parameters)
 {
     if (!is_string($method)) {
         error_log("El nombre del método debe ser una cadena de texto\n");
@@ -134,7 +148,7 @@ function apiRequestJson($method, $parameters)
     }
 
     $parameters['method'] = $method;
-    $handle = curl_init(API_URL);
+    $handle = curl_init($this->apiUrl);
     curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 5);
     curl_setopt($handle, CURLOPT_TIMEOUT, 60);
@@ -144,83 +158,20 @@ function apiRequestJson($method, $parameters)
     return exec_curl_request($handle);
 }
 
-function processMessage($message)
+
+public function sendMessage($chat_id, $text, $args = [] )
 {
-
-    // process incoming message
-
-    $message_id = $message['message_id'];
-    $chat_id = $message['chat']['id'];
-    if (isset($message['text'])) {
-
-        // incoming text message
-
-        $text = $message['text'];
-        if (strpos($text, '/start') === 0) {
-            apiRequestJson('sendMessage', [
-                'chat_id'      => $chat_id,
-                'text'         => 'Hola',
-                'reply_markup' => [
-                    'keyboard'          => [['Hola', 'Epale']],
-                    'one_time_keyboard' => true,
-                    'resize_keyboard'   => true, ],
-                ]);
-        } elseif ($text === 'Hola' || $text === 'Epale') {
-            apiRequest('sendMessage', [
-                'chat_id' => $chat_id,
-                'text'    => 'Es un placer conocerte',
-                ]);
-        } elseif (strpos($text, '/stop') === 0) {
-
-            // stop now
-        } else {
-            apiRequestWebhook('sendMessage', [
-            'chat_id' => $chat_id,
-            'text'    => 'Yo sólo entiendo mensajes de texto',
-            ]);
-        }
-    } else {
-        apiRequest('sendMessage', [
-            'chat_id' => $chat_id,
-            'text'    => 'Yo sólo entiendo mensajes de texto',
-            ]);
-    }
+    return self::apiRequest('sendMessage', [
+        'chat_id' => $chat_id, 
+        'text' => $text
+    ]);
 }
 
-function saluteNewMember($message)
+
+public function test()
 {
-    $chat_id = $message['chat']['id'];
-    $first_name = $message['new_chat_member']['first_name'];
-    $username = ($message['new_chat_member']['username']) ? '( @'.$message['new_chat_member']['username'].' )' : '';
-    $welcome_text = "📢 Bienvenido/a *$first_name* $username a [PHP.ve](https://telegram.me/PHP_Ve), te invitamos a que leas la [Descripción y Normas del Grupo](http://telegra.ph/PHPve-11-24)";
-    apiRequest('sendMessage', [
-        'chat_id'                  => $chat_id,
-        'text'                     => $welcome_text,
-        'parse_mode'               => 'Markdown',
-        'disable_web_page_preview' => true,
-        ]);
+    print("hola");
+    print($this->apiUrl);
 }
 
-if (php_sapi_name() == 'cli') {
-
-    // if run from console, set or delete webhook
-
-    apiRequest('setWebhook', ['url' => isset($argv[1]) && $argv[1] == 'delete' ? '' : WEBHOOK_URL]);
-    exit;
-}
-
-$content = file_get_contents('php://input');
-$update = json_decode($content, true);
-
-if (!$update) {
-
-    // receive wrong update, must not happen
-
-    exit;
-}
-
-if (isset($update['message']['new_chat_member'])) {
-    saluteNewMember($update['message']);
-} elseif (isset($update['message']['text'])) {
-    processMessage($update['message']);
 }
