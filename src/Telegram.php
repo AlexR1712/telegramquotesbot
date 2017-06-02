@@ -161,25 +161,22 @@ public function apiRequestJson($method, $parameters)
 }
 
 
-public function sendMessage($chat_id, $text, $args=[])
-{
-    $parameters = $args;
-    $parameters['chat_id'] = $chat_id;
-    $parameters['text'] = $text;
+    public function sendMessage($chat_id, $text, $args=[])
+    {
+        $parameters = $args;
+        $parameters['chat_id'] = $chat_id;
+        $parameters['text'] = $text;
 
-    return $this->apiRequest('sendMessage', $parameters);
-}
+        return $this->apiRequest('sendMessage', $parameters);
+    }
 
-public function setWebhook($certificate = null, $max_connections = null, $allowed_updates = [])
-{
-    $parameters['url'] = $this->webhook;
-    $parameters['certificate'] = $certificate;
-    $parameters['max_connections'] = $max_connections;
-    $parameters['allowed_updates'] = $allowed_updates;
+    public function setWebhook($certificate = null, $max_connections = null, $allowed_updates = [])
+    {
+        $parameters['url'] = $this->webhook;
+        $parameters['certificate'] = $certificate;
+        $parameters['max_connections'] = $max_connections;
+        $parameters['allowed_updates'] = $allowed_updates;
 
-    return $this->apiRequest('setWebhook', $parameters);
-}
-
-
-
+        return $this->apiRequest('setWebhook', $parameters);
+    }
 }
