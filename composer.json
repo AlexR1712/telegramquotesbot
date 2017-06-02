@@ -1,5 +1,5 @@
 {
-    "name": "phpdevenezuela/telegrambot",
+    "name": "alexr1712/telegramquotesbot",
     "type": "project",
     "authors": [
         {
@@ -7,5 +7,19 @@
             "email": "alexr1712@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+    	"php": "^5.6.0",
+        "phpunit/phpunit": "^6.1"
+    },
+
+        "autoload": {
+        "psr-4": {
+            "AlexR1712\\": "src/"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "php setWebhook.php"
+        ]
+    }
 }

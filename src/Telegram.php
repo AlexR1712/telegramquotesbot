@@ -3,7 +3,8 @@
 /**
  * Class create by AlexR1712
  */
-print(realpath('.'));
+namespace AlexR1712;
+
 class Telegram
 {
     private $token;
@@ -17,6 +18,7 @@ class Telegram
          */
         $config = parse_ini_file("bot.config");
         $this->apiUrl = ($pwrtelegram) ? 'https://api.pwrtelegram.xyz/bot'.$config['BOT_TOKEN'].'/' : 'https://api.telegram.org/bot'.$config['BOT_TOKEN'].'/';
+        $this->webhook = $config['WEBHOOK_URL'];
     }
 
 
@@ -159,19 +161,25 @@ public function apiRequestJson($method, $parameters)
 }
 
 
-public function sendMessage($chat_id, $text, $args = [] )
+public function sendMessage($chat_id, $text, $args=[])
 {
-    return self::apiRequest('sendMessage', [
-        'chat_id' => $chat_id, 
-        'text' => $text
-    ]);
+    $parameters = $args;
+    $parameters['chat_id'] = $chat_id;
+    $parameters['text'] = $text;
+
+    return $this->apiRequest('sendMessage', $parameters);
+}
+
+public function setWebhook($certificate = null, $max_connections = null, $allowed_updates = [])
+{
+    $parameters['url'] = $this->webhook;
+    $parameters['certificate'] = $certificate;
+    $parameters['max_connections'] = $max_connections;
+    $parameters['allowed_updates'] = $allowed_updates;
+
+    return $this->apiRequest('setWebhook', $parameters);
 }
 
 
-public function test()
-{
-    print("hola");
-    print($this->apiUrl);
-}
 
 }
