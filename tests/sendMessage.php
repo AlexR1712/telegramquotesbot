@@ -1,7 +1,7 @@
-<?php 
+<?php
 
-require "src/Telegram.php";
+
+require 'src/Telegram.php';
 $bot = new Telegram();
 
-
-var_dump($bot->sendMessage(133433434, "Prueba"));
+var_dump($bot->sendMessage(133433434, 'Prueba'));
